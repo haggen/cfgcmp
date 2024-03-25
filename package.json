@@ -1,0 +1,26 @@
+{
+  "name": "cfgcmp",
+  "version": "1.0.0",
+  "description": "Compare configuration files.",
+  "source": "src/index.html",
+  "scripts": {
+    "prestart": "test -d node_modules || npm ci",
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "keywords": [
+    "config",
+    "compare",
+    "ini"
+  ],
+  "author": "Arthur <arthur@corenzan.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "parcel": "^2.12.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "process": "^0.11.10"
+  }
+}

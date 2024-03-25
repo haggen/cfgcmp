@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font: 16px/1.5 system-ui, sans-serif;
+}
+
+.dropzone {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.dropzone.active {
+  background-color: aliceblue;
+  color: dodgerblue;
+}
+
+.dropzone p {
+  pointer-events: none;
+}
