@@ -40,11 +40,54 @@ li {
 }
 
 .diff {
-  display: grid;
-  grid-template: auto / repeat(2, 1fr);
+  display: block;
 }
 
-.diff pre {
-  overflow: auto;
-  padding: 1.5rem;
+.diff-row {
+  display: grid;
+  grid-template: auto / 5rem repeat(3, 1fr);
+  counter-increment: list-item;
+  font: 0.875rem monospace;
+}
+
+.diff-col,
+.diff-row::before {
+  padding: 0.25rem 0.5rem;
+  white-space: pre-wrap;
+}
+
+.diff-row:not(:hover) .diff-col {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diff-row::before {
+  background-color: whitesmoke;
+  color: gray;
+  content: counter(list-item);
+  text-align: right;
+}
+
+.diff-row.match-equal {
+  color: dimgray;
+}
+
+.diff-row.match-a,
+.diff-row.match-b,
+.diff-row.match-different {
+  background-color: ivory;
+  color: darkgoldenrod;
+}
+
+.diff-row.match-a .diff-col.value-b,
+.diff-row.match-b .diff-col.value-a {
+  background-color: mistyrose;
+  color: orangered;
+}
+
+.diff-row.match-a .diff-col.value-a,
+.diff-row.match-b .diff-col.value-b {
+  background-color: mintcream;
+  color: forestgreen;
 }
