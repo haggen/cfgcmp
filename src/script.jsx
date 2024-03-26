@@ -1,6 +1,8 @@
 import { createRoot } from "react-dom/client";
-import { StrictMode, useEffect, useState } from "react";
+import { StrictMode, useEffect, useReducer, useState } from "react";
 import ini from "ini";
+
+let nextClipboardId = 0;
 
 function Dropzone({ step, handler }) {
   const [active, setActive] = useState(false);
@@ -34,7 +36,7 @@ function Dropzone({ step, handler }) {
       }
     } else {
       const src = event.clipboardData.getData("text/plain");
-      const file = new File([src], "clipboard");
+      const file = new File([src], `clipboard-${nextClipboardId++}.ini`);
       handler(file);
     }
   };
@@ -71,22 +73,22 @@ function Diff({ diff }) {
       {Array.from(diff.entries()).map(([key, match]) => (
         <li key={key} className={`diff-row match-${match.result}`}>
           <span className="diff-col key">{key}</span>
-          <span className="diff-col value-a">{match.a}</span>
-          <span className="diff-col value-b">{match.b}</span>
+          <span className="diff-col value value-a">{String(match.a)}</span>
+          <span className="diff-col value value-b">{String(match.b)}</span>
         </li>
       ))}
     </ol>
   );
 }
 
-function getFlattenedObject(source, prefix = "") {
+function getFlatConfig(config, prefix = "") {
   const result = {};
 
-  for (const [key, value] of Object.entries(source)) {
+  for (const [key, value] of Object.entries(config)) {
     const path = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && value !== null) {
-      Object.assign(result, getFlattenedObject(value, path));
+      Object.assign(result, getFlatConfig(value, path));
     } else {
       result[path] = value;
     }
@@ -105,55 +107,128 @@ function compareValues(a, b) {
   return a === b ? "equal" : "different";
 }
 
-function getDiffMap(contents) {
+function getDiff(configs) {
   const keys = new Set([
-    ...contents
-      .map((object) => Object.keys(object))
+    ...configs
+      .map((config) => Object.keys(config.config))
       .flat()
       .sort(),
   ]);
 
   const diff = new Map();
+  diff.totals = { differences: 0, a: 0, b: 0 };
 
   for (const key of keys) {
+    const result = compareValues(
+      configs[0].config[key],
+      configs[1].config[key]
+    );
+
+    if (result !== "equal") {
+      diff.totals.differences++;
+
+      if (result === "a") {
+        diff.totals.a++;
+      } else if (result === "b") {
+        diff.totals.b++;
+      }
+    }
+
     diff.set(key, {
-      a: contents[0][key],
-      b: contents[1][key],
-      result: compareValues(contents[0][key], contents[1][key]),
+      a: configs[0].config[key],
+      b: configs[1].config[key],
+      result,
     });
   }
 
   return diff;
 }
 
+function reducer(state, action) {
+  switch (action.type) {
+    case "configs/added":
+      if (state.configs.length >= 2) {
+        return state;
+      }
+      return { ...state, configs: [...state.configs, action.payload] };
+    case "configs/reset":
+      return { ...state, configs: [] };
+    default:
+      return state;
+  }
+}
+
 function App() {
-  const [contents, setContents] = useState([]);
+  const [state, dispatch] = useReducer(reducer, {
+    configs: [],
+  });
 
   const handleFile = (file) => {
     file.text().then((text) => {
-      setContents((contents) => {
-        contents[contents.length % 2] = getFlattenedObject(ini.decode(text));
-        return [...contents];
+      dispatch({
+        type: "configs/added",
+        payload: {
+          file: file.name,
+          config: getFlatConfig(ini.decode(text)),
+        },
       });
     });
   };
 
   const restart = () => {
-    setContents([]);
+    dispatch({ type: "configs/reset" });
   };
 
-  if (contents.length < 2) {
-    return <Dropzone step={contents.length} handler={handleFile} />;
+  if (state.configs.length < 2) {
+    return <Dropzone step={state.configs.length} handler={handleFile} />;
   }
+
+  const diff = getDiff(state.configs);
 
   return (
     <div>
-      <menu className="toolbar">
-        <li>
-          <button onClick={() => restart()}>Restart</button>
-        </li>
-      </menu>
-      <Diff diff={getDiffMap(contents)} />
+      <header className="toolbar">
+        <div />
+
+        <div
+          className="flex"
+          style={{ justifyContent: "space-between", paddingInline: "0.75rem" }}
+        >
+          <ul className="flex" style={{ gap: "0.75rem" }}>
+            <li>
+              Total: <strong>{diff.size}</strong>
+            </li>
+            <li>
+              Difference: <strong>{diff.totals.differences}</strong>
+            </li>
+          </ul>
+
+          <menu>
+            <li>
+              <button className="button" onClick={() => restart()}>
+                Restart
+              </button>
+            </li>
+          </menu>
+        </div>
+
+        <div
+          className="flex"
+          style={{ justifyContent: "space-between", paddingInline: "0.75rem" }}
+        >
+          <span>{state.configs[0].file}</span>
+          <span style={{ color: "green" }}>+{diff.totals.a}</span>
+        </div>
+        <div
+          className="flex"
+          style={{ justifyContent: "space-between", paddingInline: "0.75rem" }}
+        >
+          <span>{state.configs[1].file}</span>
+          <span style={{ color: "green" }}>+{diff.totals.b}</span>
+        </div>
+      </header>
+
+      <Diff diff={diff} />
     </div>
   );
 }

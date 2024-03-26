@@ -12,12 +12,31 @@ li {
   list-style: none;
 }
 
+.button {
+  align-items: center;
+  background-color: dodgerblue;
+  border-radius: 0.25rem;
+  border: 0;
+  color: white;
+  display: flex inline;
+  font-family: inherit;
+  font-size: 1em;
+  line-height: 1.25;
+  padding-inline: 0.75rem;
+  height: 1.5rem;
+}
+
+.flex {
+  align-items: center;
+  display: flex;
+}
+
 .dropzone {
   align-items: center;
   display: flex;
+  height: 100vh;
   justify-content: center;
   width: 100vw;
-  height: 100vh;
 }
 
 .dropzone.active {
@@ -33,10 +52,12 @@ li {
   align-items: center;
   background-color: white;
   border-bottom: 1px solid gainsboro;
-  display: flex;
-  padding: 0.75rem;
+  display: grid;
+  grid-template: auto / 5rem repeat(3, 1fr);
   position: sticky;
+  padding-block: 0.75rem;
   top: 0;
+  justify-content: space-between;
 }
 
 .diff {
@@ -50,9 +71,14 @@ li {
   font: 0.875rem monospace;
 }
 
+.diff-row:hover {
+  background-color: whitesmoke;
+}
+
 .diff-col,
 .diff-row::before {
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.75rem;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 
@@ -73,21 +99,24 @@ li {
   color: dimgray;
 }
 
-.diff-row.match-a,
-.diff-row.match-b,
-.diff-row.match-different {
-  background-color: ivory;
+.diff-row:not(.match-equal) .diff-col.key {
+  font-weight: bolder;
+  color: black;
+}
+
+.diff-row.match-different .diff-col.value {
+  background-color: color-mix(in srgb, yellow, transparent 95%);
   color: darkgoldenrod;
 }
 
 .diff-row.match-a .diff-col.value-b,
 .diff-row.match-b .diff-col.value-a {
-  background-color: mistyrose;
-  color: orangered;
+  background-color: color-mix(in srgb, orangered, transparent 95%);
+  color: brown;
 }
 
 .diff-row.match-a .diff-col.value-a,
 .diff-row.match-b .diff-col.value-b {
-  background-color: mintcream;
-  color: forestgreen;
+  background-color: color-mix(in srgb, yellowgreen, transparent 95%);
+  color: green;
 }
