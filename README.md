@@ -2,11 +2,13 @@
 
 > Compare configuration files.
 
+![Screenshot of the application.](image.webp)
+
 ## About
 
 Simple text diffing tools are not very good at comparing configuration values. If the configuration keys are in a different order, values are written in a different way, or if commentary doesn't match it will show a lot of noise.
 
-**cfgcmp** diffs in a structured way, suited for configuration. It'll strip comments and whitespace, sort keys and normalize values before comparing them.
+**cfgcmp** is a web application that diffs in a structured way, suited for configurations. It'll strip comments and whitespace, sort keys and normalize values before comparing them.
 
 It all happens on the client, so no remote calls are made.
 
