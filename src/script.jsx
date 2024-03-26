@@ -55,10 +55,10 @@ function Dropzone({ step, handler }) {
       onDrop={handleDrop}
     >
       {step === 0 ? (
-        <p>Drop or paste configuration files to compare.</p>
+        <p>Drop or paste *.ini files to compare.</p>
       ) : (
         <p>
-          Drop or paste <strong>another</strong> configuration file to compare.
+          Drop or paste <strong>another</strong> *.ini file to compare.
         </p>
       )}
     </div>
