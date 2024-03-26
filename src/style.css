@@ -8,6 +8,10 @@ html {
   font: 16px/1.5 system-ui, sans-serif;
 }
 
+li {
+  list-style: none;
+}
+
 .dropzone {
   align-items: center;
   display: flex;
@@ -23,4 +27,24 @@ html {
 
 .dropzone p {
   pointer-events: none;
+}
+
+.toolbar {
+  align-items: center;
+  background-color: white;
+  border-bottom: 1px solid gainsboro;
+  display: flex;
+  padding: 0.75rem;
+  position: sticky;
+  top: 0;
+}
+
+.diff {
+  display: grid;
+  grid-template: auto / repeat(2, 1fr);
+}
+
+.diff pre {
+  overflow: auto;
+  padding: 1.5rem;
 }

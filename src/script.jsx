@@ -1,7 +1,8 @@
 import { createRoot } from "react-dom/client";
-import { StrictMode, useEffect, useReducer, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
+import ini from "ini";
 
-function Dropzone({ handler }) {
+function Dropzone({ step, handler }) {
   const [active, setActive] = useState(false);
 
   const handleDragEnter = (event) => {
@@ -53,17 +54,50 @@ function Dropzone({ handler }) {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <p>Drop or paste configuration files to compare.</p>
+      {step === 0 ? (
+        <p>Drop or paste configuration files to compare.</p>
+      ) : (
+        <p>
+          Drop or paste <strong>another</strong> configuration file to compare.
+        </p>
+      )}
     </div>
   );
 }
 
 function App() {
+  const [contents, setContents] = useState([]);
+
   const handleFile = (file) => {
-    console.log({ file });
+    file.text().then((text) => {
+      setContents((contents) => {
+        contents[contents.length % 2] = ini.decode(text);
+        return [...contents];
+      });
+    });
   };
 
-  return <Dropzone handler={handleFile} />;
+  const reset = () => {
+    setContents([]);
+  };
+
+  if (contents.length < 2) {
+    return <Dropzone step={contents.length} handler={handleFile} />;
+  }
+
+  return (
+    <div>
+      <menu className="toolbar">
+        <li>
+          <button onClick={() => reset()}>Reset</button>
+        </li>
+      </menu>
+      <div className="diff">
+        <pre>{JSON.stringify(contents[0], void 0, 2)}</pre>
+        <pre>{JSON.stringify(contents[1], void 0, 2)}</pre>
+      </div>
+    </div>
+  );
 }
 
 createRoot(root).render(
