@@ -81,6 +81,17 @@ function Diff({ diff }) {
   );
 }
 
+function Footer() {
+  return (
+    <footer className="footer">
+      <p>
+        Source available on{" "}
+        <a href="https://github.com/haggen/cfgcmp">GitHub</a>.
+      </p>
+    </footer>
+  );
+}
+
 function getFlatConfig(config, prefix = "") {
   const result = {};
 
@@ -180,13 +191,18 @@ function App() {
   };
 
   if (state.configs.length < 2) {
-    return <Dropzone step={state.configs.length} handler={handleFile} />;
+    return (
+      <div className="layout">
+        <Dropzone step={state.configs.length} handler={handleFile} />
+        <Footer />
+      </div>
+    );
   }
 
   const diff = getDiff(state.configs);
 
   return (
-    <div>
+    <div className="layout">
       <header className="toolbar">
         <div />
 
@@ -229,6 +245,8 @@ function App() {
       </header>
 
       <Diff diff={diff} />
+
+      <Footer />
     </div>
   );
 }
